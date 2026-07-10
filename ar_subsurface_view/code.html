@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>GeoScan-01 | AR Subsurface Visualization</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        .animate-pulse-glow { animation: pulse-glow 3s infinite ease-in-out; }
+        
+        .glass-panel {
+            background: rgba(23, 31, 51, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(154, 203, 255, 0.2);
+            box-shadow: inset 0 0 15px rgba(0, 119, 190, 0.1);
+        }
+
+        .ar-grid {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .depth-line {
+            background: linear-gradient(90deg, transparent, rgba(154, 203, 255, 0.4), transparent);
+        }
+
+        .hud-scanline {
+            background: linear-gradient(to bottom, transparent 50%, rgba(154, 203, 255, 0.05) 50%);
+            background-size: 100% 4px;
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#2d3449",
+                        "on-background": "#dae2fd",
+                        "tertiary-container": "#657389",
+                        "surface-container-low": "#131b2e",
+                        "on-tertiary-fixed": "#0d1c2f",
+                        "surface-container": "#171f33",
+                        "on-secondary-fixed-variant": "#653d1e",
+                        "tertiary-fixed": "#d5e3fd",
+                        "on-secondary": "#4a280a",
+                        "secondary": "#f4bb92",
+                        "surface-tint": "#9acbff",
+                        "inverse-surface": "#dae2fd",
+                        "secondary-fixed": "#ffdcc5",
+                        "surface-container-high": "#222a3d",
+                        "surface": "#0b1326",
+                        "background": "#0b1326",
+                        "error-container": "#93000a",
+                        "on-surface": "#dae2fd",
+                        "on-surface-variant": "#c0c7d2",
+                        "error": "#ffb4ab",
+                        "primary": "#9acbff",
+                        "secondary-container": "#653d1e",
+                        "outline-variant": "#404751",
+                        "surface-bright": "#31394d",
+                        "inverse-on-surface": "#283044",
+                        "secondary-fixed-dim": "#f4bb92",
+                        "on-primary-fixed": "#001d34",
+                        "surface-variant": "#2d3449",
+                        "on-error": "#690005",
+                        "on-tertiary": "#233144",
+                        "surface-container-lowest": "#060e20",
+                        "tertiary-fixed-dim": "#b9c7e0",
+                        "primary-fixed-dim": "#9acbff",
+                        "tertiary": "#b9c7e0",
+                        "on-primary-container": "#f7f9ff",
+                        "primary-container": "#0077be",
+                        "on-primary": "#003355",
+                        "outline": "#8a919c",
+                        "primary-fixed": "#cfe5ff",
+                        "inverse-primary": "#00629e",
+                        "on-tertiary-container": "#f7f8ff",
+                        "on-secondary-container": "#e1aa82",
+                        "surface-dim": "#0b1326",
+                        "on-primary-fixed-variant": "#004a79",
+                        "on-tertiary-fixed-variant": "#3a485c",
+                        "on-secondary-fixed": "#301400"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "panel-padding": "20px",
+                        "unit": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "data-label": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "headline-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "data-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden h-screen w-screen selection:bg-primary/30">
+<!-- TOP APP BAR -->
+<header class="bg-surface docked full-width top-0 flex justify-between items-center px-gutter w-full h-16 border-b border-outline-variant z-50 fixed">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="location_on">location_on</span>
+<h1 class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary">Project GeoScan-01</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end">
+<span class="font-data-label text-data-label text-primary">GPS: ACTIVE</span>
+<span class="font-data-label text-data-label text-on-surface-variant">LOCK: 0.04m ACCURACY</span>
+</div>
+<span class="material-symbols-outlined text-primary" data-icon="cloud_done">cloud_done</span>
+</div>
+</header>
+<!-- MAIN AR CANVAS -->
+<main class="relative h-screen w-full pt-16 pb-20">
+<!-- SIMULATED CAMERA FEED -->
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center brightness-50" data-alt="A wide-angle field photograph of a rugged, open landscape at dusk. The horizon is filled with undulating hills under a moody, slate-gray sky. The grass is sparse and dry, with occasional rocky outcrops. The entire image has a professional cinematic blur applied to simulate a focused AR viewfinder background, emphasizing the technical HUD overlays." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuATOCi3-a8_rFWvf5AE_ImkM0oIFOE8pZ0v9JP7LBYEgmQw0b7F3TMTs8xjMVDwT81Tp9oWUdVuZ2Tg4ca1XLRz5NBSaflIMZ_-nkhhp-XLbKRzUWrnzAGZMndwzs3CFkL-nXqvCIMDvQDtKkdEgKrV8d-0R0g8IWOagnsjvKmAvisVz6Dhfha5POcgYqSxr9Uq0EkcTeE67WqRw5XS80kQqHkHh8wFQ0vCmp-x3qP3NxvfAtoJd_yNFhcbZwaP_XBx_UpBTwRggbEe')"></div>
+<div class="absolute inset-0 hud-scanline opacity-30"></div>
+</div>
+<!-- 3D HEATMAP & GRID OVERLAY (The "Canvas") -->
+<div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+<div class="ar-grid relative w-[800px] h-[600px] flex items-center justify-center">
+<!-- Ground Plane Grid -->
+<div class="absolute w-full h-[200px] border border-primary/30 bg-primary/5 origin-bottom" style="transform: rotateX(75deg) translateY(150px);">
+<div class="w-full h-full" style="background-image: radial-gradient(circle, rgba(154, 203, 255, 0.2) 1px, transparent 1px); background-size: 40px 40px;"></div>
+</div>
+<!-- Depth Markers -->
+<div class="absolute left-10 flex flex-col items-center gap-24 transform -translate-y-12">
+<div class="flex items-center gap-4">
+<span class="font-data-label text-data-label text-primary">05m</span>
+<div class="w-20 h-[1px] depth-line"></div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-label text-data-label text-primary">10m</span>
+<div class="w-32 h-[1px] depth-line"></div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-label text-data-label text-primary">15m</span>
+<div class="w-48 h-[1px] depth-line"></div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-label text-data-label text-primary">20m</span>
+<div class="w-64 h-[1px] depth-line"></div>
+</div>
+</div>
+<!-- Volumetric Cloud (Groundwater) -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+
+<div class="glass-panel px-3 py-2 rounded absolute -right-20 top-0 border-l-4 border-l-primary">
+<p class="font-data-label text-data-label text-primary">AQUIFER DETECTED</p>
+<p class="font-data-label text-data-label text-on-surface">P: 84% | FLUID: WATER</p>
+<p class="font-data-label text-data-label text-on-surface">DEPTH: 12.4m</p>
+</div>
+</div>
+<!-- Heatmap Glow -->
+<div class="absolute bottom-0 w-full h-[300px] bg-gradient-to-t from-primary/10 via-secondary/5 to-transparent blur-3xl opacity-40"></div>
+</div>
+</div>
+<!-- HUD ELEMENTS -->
+<!-- Center Reticle / Precision Lock -->
+<div class="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+<div class="relative w-64 h-64 border border-primary/20 rounded-full flex items-center justify-center">
+<div class="absolute inset-0 border-2 border-primary/40 rounded-full border-dashed animate-[spin_10s_linear_infinite]"></div>
+<div class="w-4 h-4 border-2 border-primary rounded-sm flex items-center justify-center">
+<div class="w-1 h-1 bg-primary rounded-full"></div>
+</div>
+<!-- Corner Brackets -->
+<div class="absolute -top-2 -left-2 w-4 h-4 border-t-2 border-l-2 border-primary"></div>
+<div class="absolute -top-2 -right-2 w-4 h-4 border-t-2 border-r-2 border-primary"></div>
+<div class="absolute -bottom-2 -left-2 w-4 h-4 border-b-2 border-l-2 border-primary"></div>
+<div class="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-primary"></div>
+<span class="absolute -bottom-8 font-data-label text-data-label text-primary tracking-widest bg-background/80 px-2">LOCKED</span>
+</div>
+</div>
+<!-- Right Tool Panel (Telemetry) -->
+<div class="absolute right-margin-desktop top-margin-desktop z-40 flex flex-col gap-unit">
+<div class="glass-panel p-panel-padding w-64 flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-primary">Sensors</h3>
+<span class="material-symbols-outlined text-primary text-sm" data-icon="tune">tune</span>
+</div>
+<div class="space-y-4">
+<div class="space-y-1">
+<div class="flex justify-between font-data-label text-data-label">
+<span class="text-on-surface-variant">SIGNAL STRENGTH</span>
+<span class="text-primary">98%</span>
+</div>
+<div class="h-1 bg-surface-container-highest w-full rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[98%]"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between font-data-label text-data-label">
+<span class="text-on-surface-variant">BATTERY</span>
+<span class="text-secondary">42%</span>
+</div>
+<div class="h-1 bg-surface-container-highest w-full rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[42%]"></div>
+</div>
+</div>
+<div class="flex items-center gap-2 pt-2 border-t border-outline-variant">
+<span class="material-symbols-outlined text-primary text-xs" data-icon="terminal">terminal</span>
+<span class="font-data-label text-data-label text-on-surface-variant truncate">Pinging subsurface...</span>
+</div>
+</div>
+</div>
+<!-- Toggle AR Button -->
+<button class="mt-4 glass-panel group hover:bg-primary-container transition-all flex items-center justify-center gap-3 py-4 rounded-xl border-primary/40">
+<span class="material-symbols-outlined text-primary group-hover:text-on-primary-container" data-icon="view_in_ar">view_in_ar</span>
+<span class="font-headline-sm text-headline-sm text-primary group-hover:text-on-primary-container">Toggle AR Mode</span>
+</button>
+</div>
+<!-- Left Tool Panel (Unit Info) -->
+<div class="absolute left-margin-desktop top-margin-desktop z-40">
+<div class="glass-panel p-panel-padding w-72 flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+</div>
+<div>
+<p class="font-headline-sm text-headline-sm leading-tight">Hydrologist 04</p>
+<p class="font-data-label text-data-label text-on-surface-variant">Field Unit A-12</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-2">
+<div class="bg-surface-container-low p-2 rounded">
+<p class="font-data-label text-data-label text-on-surface-variant">X-POS</p>
+<p class="font-data-label text-data-label text-primary">34.9011</p>
+</div>
+<div class="bg-surface-container-low p-2 rounded">
+<p class="font-data-label text-data-label text-on-surface-variant">Y-POS</p>
+<p class="font-data-label text-data-label text-primary">-112.332</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BOTTOM NAV BAR -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container-low/60 backdrop-blur-xl border-t border-primary/20 shadow-lg rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="radar">radar</span>
+<span class="font-data-label text-data-label">Scan</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-data-label text-data-label">Analysis</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="view_in_ar">view_in_ar</span>
+<span class="font-data-label text-data-label">AR View</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+<span class="font-data-label text-data-label">Sensors</span>
+</button>
+</nav>
+<!-- INTERACTION SCRIPTS -->
+<script>
+        // Simple logic to simulate data updates or HUD flicker
+        setInterval(() => {
+            const telemetryLog = document.querySelector('.truncate');
+            const messages = ["Pinging subsurface...", "Processing voxel data...", "Scanning layer 3...", "Calibrating sensors..."];
+            telemetryLog.innerText = messages[Math.floor(Math.random() * messages.length)];
+        }, 3000);
+
+        // Click to toggle "Precision Lock" state
+        const reticle = document.querySelector('.relative.w-64.h-64');
+        reticle.addEventListener('click', () => {
+            reticle.classList.toggle('border-primary');
+            reticle.classList.toggle('border-error');
+            const label = reticle.querySelector('.absolute.-bottom-8');
+            if (label.innerText === "LOCKED") {
+                label.innerText = "SEARCHING";
+                label.classList.replace('text-primary', 'text-error');
+            } else {
+                label.innerText = "LOCKED";
+                label.classList.replace('text-error', 'text-primary');
+            }
+        });
+    </script>
+</body></html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GeoScan-01 | Sensor Hardware Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .active-glow {
+            box-shadow: inset 0 0 15px rgba(154, 203, 255, 0.1), 0 0 20px rgba(154, 203, 255, 0.05);
+            border-color: #9acbff;
+        }
+        .signal-bar {
+            transition: height 0.3s ease;
+        }
+        @keyframes pulse-glow {
+            0% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.6; transform: scale(1); }
+        }
+        .pulse-active {
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#2d3449",
+                        "on-background": "#dae2fd",
+                        "tertiary-container": "#657389",
+                        "surface-container-low": "#131b2e",
+                        "on-tertiary-fixed": "#0d1c2f",
+                        "surface-container": "#171f33",
+                        "on-secondary-fixed-variant": "#653d1e",
+                        "tertiary-fixed": "#d5e3fd",
+                        "on-secondary": "#4a280a",
+                        "secondary": "#f4bb92",
+                        "surface-tint": "#9acbff",
+                        "inverse-surface": "#dae2fd",
+                        "secondary-fixed": "#ffdcc5",
+                        "surface-container-high": "#222a3d",
+                        "surface": "#0b1326",
+                        "background": "#0b1326",
+                        "error-container": "#93000a",
+                        "on-surface": "#dae2fd",
+                        "on-surface-variant": "#c0c7d2",
+                        "error": "#ffb4ab",
+                        "primary": "#9acbff",
+                        "secondary-container": "#653d1e",
+                        "outline-variant": "#404751",
+                        "surface-bright": "#31394d",
+                        "inverse-on-surface": "#283044",
+                        "secondary-fixed-dim": "#f4bb92",
+                        "on-primary-fixed": "#001d34",
+                        "surface-variant": "#2d3449",
+                        "on-error": "#690005",
+                        "on-tertiary": "#233144",
+                        "surface-container-lowest": "#060e20",
+                        "tertiary-fixed-dim": "#b9c7e0",
+                        "primary-fixed-dim": "#9acbff",
+                        "tertiary": "#b9c7e0",
+                        "on-primary-container": "#f7f9ff",
+                        "primary-container": "#0077be",
+                        "on-primary": "#003355",
+                        "outline": "#8a919c",
+                        "primary-fixed": "#cfe5ff",
+                        "inverse-primary": "#00629e",
+                        "on-tertiary-container": "#f7f8ff",
+                        "on-secondary-container": "#e1aa82",
+                        "surface-dim": "#0b1326",
+                        "on-primary-fixed-variant": "#004a79",
+                        "on-tertiary-fixed-variant": "#3a485c",
+                        "on-secondary-fixed": "#301400"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "panel-padding": "20px",
+                        "unit": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "data-label": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "headline-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "data-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center px-gutter w-full h-16 sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Project GeoScan-01</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">bluetooth</span>
+<span class="font-data-label text-data-label text-on-surface">ADMT-300HT ACTIVE</span>
+</div>
+<span class="material-symbols-outlined text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors cursor-pointer">cloud_done</span>
+</div>
+</header>
+<main class="flex-grow flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="hidden md:flex flex-col h-full w-80 bg-surface-container border-r border-outline-variant py-panel-padding">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-4 mb-2">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/30">
+<img class="w-full h-full object-cover" data-alt="A professional high-resolution close-up portrait of a field hydrologist wearing rugged gear and protective eyewear, set against a dark, industrial tech background with soft blue backlighting. The aesthetic is sharp, corporate, and scientific, mirroring a high-stakes professional environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdiXW4UPGuSyGQWMdZXHEZZbZETGYQGY9Dp3uoJOKzQEU0w32-UJ673Ntc4bul8uRwBgTyEXM4ohqmgfeXhcsRMG__69JD4nZgvpMVSCyv-cpwhCNsQ4oCEBB_fa3t-sFMRV1M5JZ31QgvmmI7MPVQ7cYGpDAH7dB0la66E8fHiyA7T6aFaEfA6mY9PHDkvVXwBPRxGXEuIP_FefufdxS4hiBdsgrmflduVkFzVqtcEWIt4YU6Oq078JM0LUi_g670-k7E_c7zuX6p"/>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">Hydrologist 04</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Field Unit A-12</p>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-2 px-2 py-0.5 bg-primary/10 rounded border border-primary/20">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-data-label text-data-label text-primary">GPS: ACTIVE</span>
+</div>
+</div>
+<nav class="flex-grow px-2 space-y-1">
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/50 transition-colors rounded-r-full group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">terminal</span>
+<span class="font-data-label text-data-label">Telemetry Logs</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/50 transition-colors rounded-r-full group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-data-label text-data-label">Project Settings</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/50 transition-colors rounded-r-full group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">account_circle</span>
+<span class="font-data-label text-data-label">User Profile</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 bg-secondary-container text-on-secondary-container font-bold rounded-r-full translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-data-label text-data-label">Sensors &amp; Calibration</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<div class="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant">
+<p class="font-data-label text-data-label text-on-surface-variant mb-2">SYSTEM STATUS</p>
+<div class="flex justify-between items-center text-[10px] font-mono">
+<span class="text-on-surface">MEMORY</span>
+<span class="text-primary">42%</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full mt-1 overflow-hidden">
+<div class="bg-primary h-full w-[42%]"></div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<section class="flex-grow overflow-y-auto p-4 md:p-8 bg-surface-dim">
+<div class="max-w-6xl mx-auto space-y-8">
+<!-- Active Device Dashboard -->
+<div class="glass-panel active-glow p-6 rounded-xl flex flex-col lg:flex-row gap-8 items-start relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[120px]">sensors</span>
+</div>
+<!-- Left: Device Info -->
+<div class="flex-grow z-10">
+<div class="flex items-center gap-3 mb-1">
+<span class="flex h-3 w-3 rounded-full bg-primary pulse-active"></span>
+<span class="font-data-label text-data-label text-primary tracking-widest">CONNECTED UNIT</span>
+</div>
+<h2 class="font-display-lg text-display-lg mb-2">ADMT-300HT</h2>
+<p class="font-data-label text-data-label text-on-surface-variant bg-surface-container-high inline-block px-3 py-1 rounded border border-outline-variant">
+                            Protocol: Bluetooth 5.4 Low Energy
+                        </p>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-primary">battery_5_bar</span>
+<span class="font-data-label text-data-label text-primary">92%</span>
+</div>
+<p class="text-[10px] text-on-surface-variant font-mono">BATTERY LIFE</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-secondary">thermostat</span>
+<span class="font-data-label text-data-label text-secondary">24.5°C</span>
+</div>
+<p class="text-[10px] text-on-surface-variant font-mono">CORE TEMP</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant col-span-2 md:col-span-1">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-green-400">check_circle</span>
+<span class="font-data-label text-data-label text-green-400">OK</span>
+</div>
+<p class="text-[10px] text-on-surface-variant font-mono">CALIBRATION STATUS</p>
+</div>
+</div>
+<div class="flex flex-wrap gap-3 mt-8">
+<button class="bg-primary-container text-on-primary-container font-headline-sm text-[14px] px-6 py-3 rounded-lg hover:brightness-110 active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">rebase_edit</span>
+                                Recalibrate
+                            </button>
+<button class="border border-outline-variant text-on-surface font-headline-sm text-[14px] px-6 py-3 rounded-lg hover:bg-surface-container-high active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">system_update</span>
+                                Firmware Update
+                            </button>
+</div>
+</div>
+<!-- Right: Signal Strength Meter -->
+<div class="w-full lg:w-64 glass-panel p-4 rounded-lg flex flex-col items-center justify-center min-h-[240px]">
+<p class="font-data-label text-data-label text-on-surface-variant mb-6">SIGNAL FIDELITY</p>
+<div class="flex items-end gap-1.5 h-32 mb-4">
+<div class="signal-bar w-3 bg-primary/20 rounded-t h-4"></div>
+<div class="signal-bar w-3 bg-primary/40 rounded-t h-8"></div>
+<div class="signal-bar w-3 bg-primary/60 rounded-t h-12"></div>
+<div class="signal-bar w-3 bg-primary/80 rounded-t h-16"></div>
+<div class="signal-bar w-3 bg-primary rounded-t h-20 shadow-[0_0_10px_rgba(154,203,255,0.5)]"></div>
+<div class="signal-bar w-3 bg-primary/80 rounded-t h-14"></div>
+<div class="signal-bar w-3 bg-primary/60 rounded-t h-10"></div>
+<div class="signal-bar w-3 bg-primary/40 rounded-t h-6"></div>
+</div>
+<div class="text-center">
+<p class="font-headline-md text-primary">-42 dBm</p>
+<p class="font-data-label text-[10px] text-on-surface-variant">EXCELLENT CONNECTION</p>
+</div>
+</div>
+</div>
+<!-- Available & Recommended Sensors -->
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined">devices_other</span>
+                            Recommended Hardware
+                        </h3>
+<button class="text-primary font-data-label text-data-label hover:underline">Scan for nearby devices</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Sensor 1 -->
+<div class="glass-panel p-4 rounded-xl border border-outline-variant hover:border-outline transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">radar</span>
+</div>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-1 rounded text-[10px] font-mono border border-outline-variant">DISCONNECTED</span>
+</div>
+<h4 class="font-headline-sm text-[16px] text-on-surface mb-1">PQWT-TC300</h4>
+<p class="text-on-surface-variant font-body-sm text-[12px] mb-4">Multi-channel hydrogeological exploration system. Optimized for deep aquifer detection.</p>
+<button class="w-full py-2 bg-surface-container-high hover:bg-primary/20 text-on-surface font-data-label text-data-label rounded border border-outline-variant transition-all">CONNECT SENSOR</button>
+</div>
+<!-- Sensor 2 -->
+<div class="glass-panel p-4 rounded-xl border border-outline-variant hover:border-outline transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">layers</span>
+</div>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-1 rounded text-[10px] font-mono border border-outline-variant">DISCONNECTED</span>
+</div>
+<h4 class="font-headline-sm text-[16px] text-on-surface mb-1">Screening Eagle Pro</h4>
+<p class="text-on-surface-variant font-body-sm text-[12px] mb-4">Ground Penetrating Radar (GPR) for high-resolution subsurface mapping.</p>
+<button class="w-full py-2 bg-surface-container-high hover:bg-primary/20 text-on-surface font-data-label text-data-label rounded border border-outline-variant transition-all">CONNECT SENSOR</button>
+</div>
+</div>
+</div>
+<!-- Telemetry Visualizer Placeholder -->
+<div class="relative h-64 rounded-xl overflow-hidden glass-panel border border-outline-variant">
+<div class="absolute inset-0 opacity-40">
+
+</div>
+<div class="absolute inset-0 p-6 flex flex-col justify-end pointer-events-none">
+<div class="flex justify-between items-end">
+<div>
+<p class="font-data-label text-data-label text-primary">LIVE DATA STREAM</p>
+<p class="text-on-surface-variant text-[10px] font-mono">ENCRYPTED CHANNEL V4.2</p>
+</div>
+<div class="text-right">
+<p class="font-data-label text-data-label text-on-surface">322.1 MB / SEC</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Nav Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container-low/60 backdrop-blur-xl border-t border-primary/20 shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">radar</span>
+<span class="font-data-label text-data-label">Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-data-label text-data-label">Analysis</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">view_in_ar</span>
+<span class="font-data-label text-data-label">AR View</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">settings_input_component</span>
+<span class="font-data-label text-data-label">Sensors</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for signal bars
+        const bars = document.querySelectorAll('.signal-bar');
+        setInterval(() => {
+            bars.forEach(bar => {
+                const baseHeight = parseInt(bar.style.height || getComputedStyle(bar).height);
+                const variance = Math.floor(Math.random() * 6) - 3;
+                const newHeight = Math.max(10, Math.min(80, baseHeight + variance));
+                // Only slightly modulate to feel like real signal fluctuation
+            });
+        }, 150);
+
+        // Simple mock for "recalibrate" button
+        document.querySelector('button:contains("Recalibrate")')?.addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Calibrating...';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span> Finished';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            }, 3000);
+        });
+
+        // Helper for selector
+        function initSelectors() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => {
+                if (btn.innerText.includes('Recalibrate')) {
+                    btn.onclick = () => {
+                         const icon = btn.querySelector('.material-symbols-outlined');
+                         icon.classList.add('animate-spin');
+                         setTimeout(() => icon.classList.remove('animate-spin'), 2000);
+                    }
+                }
+            });
+        }
+        initSelectors();
+    </script>
+</body></html>

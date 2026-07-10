@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Export Geological Data - GeoScan-01</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#f7f8ff",
+                        "on-secondary-container": "#e1aa82",
+                        "inverse-primary": "#00629e",
+                        "on-secondary-fixed": "#301400",
+                        "surface-dim": "#0b1326",
+                        "on-tertiary-fixed-variant": "#3a485c",
+                        "on-primary-fixed-variant": "#004a79",
+                        "tertiary-fixed-dim": "#b9c7e0",
+                        "surface-container-lowest": "#060e20",
+                        "on-error": "#690005",
+                        "on-tertiary": "#233144",
+                        "outline": "#8a919c",
+                        "on-primary": "#003355",
+                        "primary-fixed": "#cfe5ff",
+                        "tertiary": "#b9c7e0",
+                        "primary-container": "#0077be",
+                        "on-primary-container": "#f7f9ff",
+                        "primary-fixed-dim": "#9acbff",
+                        "outline-variant": "#404751",
+                        "secondary-container": "#653d1e",
+                        "primary": "#9acbff",
+                        "on-surface-variant": "#c0c7d2",
+                        "error": "#ffb4ab",
+                        "background": "#0b1326",
+                        "on-surface": "#dae2fd",
+                        "error-container": "#93000a",
+                        "surface-variant": "#2d3449",
+                        "on-primary-fixed": "#001d34",
+                        "secondary-fixed-dim": "#f4bb92",
+                        "surface-bright": "#31394d",
+                        "inverse-on-surface": "#283044",
+                        "surface-container": "#171f33",
+                        "on-secondary-fixed-variant": "#653d1e",
+                        "on-tertiary-fixed": "#0d1c2f",
+                        "tertiary-container": "#657389",
+                        "surface-container-low": "#131b2e",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#2d3449",
+                        "on-background": "#dae2fd",
+                        "surface": "#0b1326",
+                        "secondary-fixed": "#ffdcc5",
+                        "surface-container-high": "#222a3d",
+                        "surface-tint": "#9acbff",
+                        "secondary": "#f4bb92",
+                        "inverse-surface": "#dae2fd",
+                        "tertiary-fixed": "#d5e3fd",
+                        "on-secondary": "#4a280a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "gutter": "16px",
+                        "panel-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "data-label": ["JetBrains Mono"],
+                        "headline-md-mobile": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "data-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .active-ring {
+            box-shadow: inset 0 0 10px rgba(154, 203, 255, 0.3), 0 0 0 2px #9acbff;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0b1326;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary/30 min-h-screen flex items-center justify-center p-gutter">
+<!-- Top App Bar (As per JSON) -->
+<header class="fixed top-0 left-0 w-full h-16 bg-surface dark:bg-surface text-primary flex justify-between items-center px-gutter z-50 border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<span class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary">Project GeoScan-01</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-label text-data-label opacity-70">UNIT: A-12</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+</div>
+</header>
+<!-- Modal Container -->
+<div class="max-w-4xl w-full glass-panel rounded-xl overflow-hidden shadow-2xl relative z-10 animate-in fade-in zoom-in duration-300 mt-16 mb-20 md:mb-0">
+<!-- Header Section -->
+<div class="p-panel-padding border-b border-outline-variant bg-surface-container-high/40">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Export Data Package</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Configure parameters for subsurface analysis extraction.</p>
+</div>
+<button class="p-2 hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-0">
+<!-- Selection Side (8 Cols) -->
+<div class="md:col-span-8 p-panel-padding border-r border-outline-variant">
+<div class="space-y-4">
+<label class="font-data-label text-data-label uppercase tracking-widest text-primary block mb-2">Select Export Format</label>
+<!-- Option 1: Google Earth -->
+<div class="group relative flex items-start gap-4 p-4 rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-all cursor-pointer" id="opt-kml" onclick="selectOption('opt-kml')">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">public</span>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm">Google Earth (KML/KMZ)</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Includes 3D path visualization and precise point markers for topographical overlay.</p>
+</div>
+<div class="radio-indicator w-5 h-5 rounded-full border-2 border-outline mt-1 group-data-[selected=true]:border-primary group-data-[selected=true]:bg-primary flex items-center justify-center">
+<div class="w-2 h-2 bg-on-primary rounded-full hidden group-data-[selected=true]:block"></div>
+</div>
+</div>
+<!-- Option 2: GIS Package -->
+<div class="group relative flex items-start gap-4 p-4 rounded-xl border border-primary bg-surface-container-high transition-all cursor-pointer active-ring" data-selected="true" id="opt-gis" onclick="selectOption('opt-gis')">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary/20 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">layers</span>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm">GIS Package (GeoJSON/SHP)</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">High-precision resistivity layers, coordinate matrices, and vector geological boundaries.</p>
+</div>
+<div class="radio-indicator w-5 h-5 rounded-full border-2 border-primary bg-primary mt-1 flex items-center justify-center">
+<div class="w-2 h-2 bg-on-primary rounded-full block"></div>
+</div>
+</div>
+<!-- Option 3: PDF Report -->
+<div class="group relative flex items-start gap-4 p-4 rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-all cursor-pointer" id="opt-pdf" onclick="selectOption('opt-pdf')">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-tertiary/10 text-tertiary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">description</span>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm">Full PDF Report</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Formatted executive summary with stratigraphy charts, heatmaps, and hydrological commentary.</p>
+</div>
+<div class="radio-indicator w-5 h-5 rounded-full border-2 border-outline mt-1 group-data-[selected=true]:border-primary group-data-[selected=true]:bg-primary flex items-center justify-center">
+<div class="w-2 h-2 bg-on-primary rounded-full hidden group-data-[selected=true]:block"></div>
+</div>
+</div>
+</div>
+<!-- Toggles & Parameters -->
+<div class="mt-8 pt-8 border-t border-outline-variant space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">database</span>
+<div>
+<h4 class="font-headline-sm text-[16px]">Include Raw Sensor Data</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Export uncompressed telemetry logs (Binary/CSV)</p>
+</div>
+</div>
+<button class="w-11 h-6 bg-surface-container-highest rounded-full p-1 transition-colors relative" onclick="this.classList.toggle('bg-primary'); this.querySelector('div').classList.toggle('translate-x-5')">
+<div class="w-4 h-4 bg-on-surface rounded-full transition-transform"></div>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">analytics</span>
+<div>
+<h4 class="font-headline-sm text-[16px]">Apply AI Noise Reduction</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Filter atmospheric interference from sensor signal</p>
+</div>
+</div>
+<button class="w-11 h-6 bg-primary rounded-full p-1 transition-colors relative" onclick="this.classList.toggle('bg-primary'); this.querySelector('div').classList.toggle('translate-x-5')">
+<div class="w-4 h-4 bg-on-surface rounded-full transition-transform translate-x-5"></div>
+</button>
+</div>
+</div>
+</div>
+<!-- Preview Side (4 Cols) -->
+<div class="md:col-span-4 bg-surface-container-lowest/50 p-panel-padding flex flex-col h-full">
+<label class="font-data-label text-data-label uppercase tracking-widest text-primary block mb-4">Preview Details</label>
+<div class="flex-1 space-y-4">
+<div class="rounded-lg overflow-hidden border border-outline-variant h-40 relative group">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="A highly detailed 3D geological visualization of subsurface stratigraphy with vibrant blue and orange layers indicating different soil densities and water tables. The visual is displayed on a high-tech digital interface with monospaced telemetry data, glowing grid lines, and a professional dark mode aesthetic, suggesting scientific precision and advanced geophysical scanning technology." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDXgcpVcWIDLFMeVgLQHKqhmp2-UwNx3t63jrlsqqCXYb9FJcLDGPQdHsGfZlpf1HHxIlw_kss5YCfWrFvKCTGVemACXAzSiykMob2hZNvH3LTnsKQ6_269hy6ArexZ4-IyRPyVFrtGkYcFBbxTcbJ-A4Eu61ZhCTlz_UJ8F0UXSb5U0IWYS-nPHRuAMhnv67LVm8q4ck7HKdEqFzHfnzqWPJCT-NE6euBvLMtQaLM4RpIjWmlJGSvmCXd42H__JlYDfwEhyw1sT0CO')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent opacity-60"></div>
+<div class="absolute bottom-2 left-2 flex gap-1">
+<span class="px-2 py-0.5 bg-primary/20 text-primary text-[10px] rounded-sm font-data-label uppercase">Resistivity</span>
+<span class="px-2 py-0.5 bg-secondary/20 text-secondary text-[10px] rounded-sm font-data-label uppercase">GPS: Lock</span>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between border-b border-outline-variant/30 pb-2">
+<span class="text-on-surface-variant font-data-label text-[10px]">Estimated Size:</span>
+<span class="text-on-surface font-data-label text-[10px]">142.4 MB</span>
+</div>
+<div class="flex justify-between border-b border-outline-variant/30 pb-2">
+<span class="text-on-surface-variant font-data-label text-[10px]">CRS System:</span>
+<span class="text-on-surface font-data-label text-[10px]">WGS 84 / EPSG:4326</span>
+</div>
+<div class="flex justify-between border-b border-outline-variant/30 pb-2">
+<span class="text-on-surface-variant font-data-label text-[10px]">Export Hash:</span>
+<span class="text-on-surface font-data-label text-[10px]">SHA-256 Verified</span>
+</div>
+</div>
+<div class="p-3 bg-primary-container/10 rounded-lg border border-primary/20">
+<div class="flex items-center gap-2 text-primary mb-1">
+<span class="material-symbols-outlined text-sm">info</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Hydrologist Note</span>
+</div>
+<p class="text-[11px] leading-relaxed text-on-surface-variant italic">
+                            "Selected GIS layers contain high-resolution groundwater intersection data. Compatible with ArcGIS and QGIS 3.0+."
+                        </p>
+</div>
+</div>
+<div class="mt-8 space-y-3">
+<button class="w-full py-4 bg-primary text-on-primary font-bold rounded-lg flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all group" id="export-btn">
+<span class="material-symbols-outlined group-hover:rotate-12 transition-transform">download</span>
+                        Export Data
+                    </button>
+<button class="w-full py-2 bg-transparent text-on-surface-variant font-medium text-sm hover:text-on-surface transition-colors">
+                        Cancel &amp; Return
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Nav Bar (As per JSON) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container-low/60 backdrop-blur-xl border-t border-primary/20 shadow-lg md:hidden">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">radar</span>
+<span class="font-data-label text-data-label">Scan</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-data-label text-data-label">Analysis</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">view_in_ar</span>
+<span class="font-data-label text-data-label">AR View</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">settings_input_component</span>
+<span class="font-data-label text-data-label">Sensors</span>
+</div>
+</nav>
+<!-- Side Calibration Drawer Indicator (Visual Only) -->
+<div class="hidden md:flex fixed left-0 top-1/2 -translate-y-1/2 w-10 h-32 bg-surface-container border border-l-0 border-outline-variant rounded-r-xl flex-col items-center justify-center gap-4 cursor-pointer hover:bg-surface-variant transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:rotate-90 transition-transform">tune</span>
+<span class="font-data-label text-[10px] [writing-mode:vertical-lr] tracking-widest text-on-surface-variant uppercase">Calibration</span>
+</div>
+<script>
+        function selectOption(id) {
+            const ids = ['opt-kml', 'opt-gis', 'opt-pdf'];
+            ids.forEach(optId => {
+                const el = document.getElementById(optId);
+                const indicator = el.querySelector('.radio-indicator');
+                const inner = indicator.querySelector('div');
+                
+                if (optId === id) {
+                    el.dataset.selected = "true";
+                    el.classList.add('border-primary', 'bg-surface-container-high', 'active-ring');
+                    el.classList.remove('border-outline-variant', 'bg-surface-container-low');
+                    indicator.classList.add('border-primary', 'bg-primary');
+                    inner.classList.remove('hidden');
+                    inner.classList.add('block');
+                } else {
+                    el.dataset.selected = "false";
+                    el.classList.remove('border-primary', 'bg-surface-container-high', 'active-ring');
+                    el.classList.add('border-outline-variant', 'bg-surface-container-low');
+                    indicator.classList.remove('border-primary', 'bg-primary');
+                    indicator.classList.add('border-outline');
+                    inner.classList.remove('block');
+                    inner.classList.add('hidden');
+                }
+            });
+        }
+
+        const exportBtn = document.getElementById('export-btn');
+        exportBtn.addEventListener('click', () => {
+            const originalContent = exportBtn.innerHTML;
+            exportBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+            `;
+            exportBtn.disabled = true;
+            exportBtn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            setTimeout(() => {
+                exportBtn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Success`;
+                exportBtn.classList.replace('bg-primary', 'bg-emerald-600');
+                
+                setTimeout(() => {
+                    exportBtn.innerHTML = originalContent;
+                    exportBtn.disabled = false;
+                    exportBtn.classList.remove('opacity-80', 'cursor-not-allowed', 'bg-emerald-600');
+                    exportBtn.classList.add('bg-primary');
+                }, 2000);
+            }, 1800);
+        });
+    </script>
+</body></html>
