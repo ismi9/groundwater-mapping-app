@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Groundwater Mapping Mobile App</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+  header { background: linear-gradient(135deg, #1e40af, #0ea5e9); padding: 2rem; text-align: center; }
+  header h1 { font-size: 1.8rem; font-weight: 700; }
+  header p { margin-top: 0.5rem; opacity: 0.85; font-size: 0.95rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  .card { background: #1e293b; border-radius: 12px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #334155; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+  .card img { width: 100%; height: 200px; object-fit: cover; }
+  .card-body { padding: 1rem 1.2rem 1.2rem; }
+  .card-body h3 { font-size: 1rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.4rem; }
+  .card-body p { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; }
+  .btn { display: inline-block; margin-top: 0.8rem; padding: 0.5rem 1rem; background: #0ea5e9; color: #fff; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; }
+  .btn:hover { background: #0284c7; }
+  footer { text-align: center; padding: 2rem; color: #475569; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>💧 Groundwater Mapping Mobile App</h1>
+  <p>Google Stitch — Multi-screen mobile application for geological & groundwater analysis</p>
+</header>
+<div class="grid">
+  <div class="card">
+    <img src="ar_subsurface_view/screen.png" alt="AR Subsurface View">
+    <div class="card-body">
+      <h3>AR Subsurface View</h3>
+      <p>Augmented reality visualization of underground layers and water tables.</p>
+      <a class="btn" href="ar_subsurface_view/code.html">View Screen</a>
+    </div>
+  </div>
+  <div class="card">
+    <img src="real_time_ground_scan/screen.png" alt="Real-time Ground Scan">
+    <div class="card-body">
+      <h3>Real-Time Ground Scan</h3>
+      <p>Live scanning interface for real-time ground and subsurface data collection.</p>
+      <a class="btn" href="real_time_ground_scan/code.html">View Screen</a>
+    </div>
+  </div>
+  <div class="card">
+    <img src="geological_analysis/screen.png" alt="Geological Analysis">
+    <div class="card-body">
+      <h3>Geological Analysis</h3>
+      <p>Detailed geological layer analysis and soil composition breakdown.</p>
+      <a class="btn" href="geological_analysis/code.html">View Screen</a>
+    </div>
+  </div>
+  <div class="card">
+    <img src="geological_analysis_updated_export/screen.png" alt="Geological Export">
+    <div class="card-body">
+      <h3>Geological Analysis — Export</h3>
+      <p>Updated export view for sharing and archiving geological data.</p>
+      <a class="btn" href="geological_analysis_updated_export/code.html">View Screen</a>
+    </div>
+  </div>
+  <div class="card">
+    <img src="gis_metadata_view/screen.png" alt="GIS Metadata">
+    <div class="card-body">
+      <h3>GIS Metadata View</h3>
+      <p>Geographic Information System metadata display with coordinate data.</p>
+      <a class="btn" href="gis_metadata_view/code.html">View Screen</a>
+    </div>
+  </div>
+  <div class="card">
+    <img src="sensor_connectivity/screen.png" alt="Sensor Connectivity">
+    <div class="card-body">
+      <h3>Sensor Connectivity</h3>
+      <p>Manage and monitor external sensor connections and data streams.</p>
+      <a class="btn" href="sensor_connectivity/code.html">View Screen</a>
+    </div>
+  </div>
+</div>
+<footer>Groundwater Mapping Mobile App · Built with Google Stitch</footer>
+</body>
+</html>
